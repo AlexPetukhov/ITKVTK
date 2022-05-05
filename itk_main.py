@@ -6,6 +6,9 @@ import itk
 #     print("Usage: " + sys.argv[0] + " <input1> <input2> <input3> ... <output>")
 #     sys.exit(1)
 
+# run:
+# python3 itk_main.py 60 "data/cells3d_coubex" "data/itk_coubex.tiff"
+
 InputDimension = 2
 OutputDimension = 3
 

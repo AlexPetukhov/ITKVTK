@@ -16,6 +16,8 @@ def get_program_parameters():
 
 
 def main():
+    # run:
+    # python3 vtk_main.py data/itk_coubex.vtk
     colors = vtk.vtkNamedColors()
 
     filename = get_program_parameters()
@@ -25,23 +27,13 @@ def main():
     reader.ReadAllVectorsOn()
     reader.Update()
 
+    gaussian_filter = vtk.vtkImageGaussianSmooth()
+    gaussian_filter.SetInputConnection(reader.GetOutputPort())
+    gaussian_filter.SetRadiusFactor(0.5)
 
-    # filter = vtk.vtkImageGaussianSmooth()
-    # filter.SetInputConnection(reader.GetOutputPort())
-
-    # data = reader.GetOutput()
-    # updateColorOpacity()
-    # composite function (using ray tracing)
-    # compositeFunction = vtk.vtkVolumeRayCastCompositeFunction()
-    # volumeMapper = vtk.vtkVolumeRayCastMapper()
-    # volumeMapper = vtk.vtkFixedPointVolumeRayCastMapper()
-    # volumeMapper.SetVolumeRayCastFunction(compositeFunction)
-    # volumeMapper.SetInput(data)
     volumeMapper = vtk.vtkSmartVolumeMapper()
-    volumeMapper.SetInputConnection(reader.GetOutputPort())
-    # make the volume
-    # volume = vtk.vtkVolume()
-    # global volume
+    volumeMapper.SetInputConnection(gaussian_filter.GetOutputPort())
+
     alphaChannelFunc = vtk.vtkPiecewiseFunction()
     alphaChannelFunc.AddPoint(0, 0.0)
     alphaChannelFunc.AddPoint(50, 0.05)
@@ -95,92 +87,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-#
-# def main():
-#     colors = vtk.vtkNamedColors()
-#
-#     filename = get_program_parameters()
-#
-#     reader = vtk.vtkStructuredPointsReader()
-#     reader.SetFileName(filename)
-#     reader.Update()
-#     data = reader.GetOutput()
-#     # updateColorOpacity()
-#     # composite function (using ray tracing)
-#     compositeFunction = vtk.vtkVolumeRayCastCompositeFunction()
-#     volumeMapper = vtk.vtkVolumeRayCastMapper()
-#     volumeMapper.SetVolumeRayCastFunction(compositeFunction)
-#     volumeMapper.SetInput(data)
-#     # make the volume
-#     # volume = vtk.vtkVolume()
-#     global volume
-#     volume.SetMapper(volumeMapper)
-#     volume.SetProperty(volumeProperty)
-#     # renderer
-#     renderer = vtk.vtkRenderer()
-#     renderWin = vtk.vtkRenderWindow()
-#     renderWin.AddRenderer(renderer)
-#     renderInteractor = vtk.vtkRenderWindowInteractor()
-#     renderInteractor.SetRenderWindow(renderWin)
-#     renderInteractor.AddObserver(vtk.vtkCommand.KeyPressEvent, keyPressed)
-#     renderer.AddVolume(volume)
-#     renderer.SetBackground(0, 0, 0)
-#     renderWin.SetSize(400, 400)
-#     renderInteractor.Initialize()
-#     renderWin.Render()
-#     renderInteractor.Start()
-
-# Read the source file.
-# reader = vtk.vtkUnstructuredGridReader()
-# reader = vtk.vtkDataReader()
-# reader.SetFileName(filename)
-# reader.ReadAllScalarsOn()
-# reader.Update()
-#
-# writer = vtk.vtkUnstructuredGridWriter()
-# writer.SetInputData(reader.GetOutput())
-# writer.SetFileName("Output.vtk")
-# writer.Write()
-
-# output = reader.GetOutput()
-# # scalar_range = output.GetScalarRange()
-#
-# # Create the mapper that corresponds the objects of the vtk.vtk file
-# # into graphics elements
-# mapper = vtk.vtkDataSetMapper()
-# mapper.SetInputData(output)
-# # mapper.SetScalarRange(scalar_range)
-# mapper.ScalarVisibilityOff()
-#
-# # Create the Actor
-# actor = vtk.vtkActor()
-# actor.SetMapper(mapper)
-# actor.GetProperty().EdgeVisibilityOn()
-# actor.GetProperty().SetLineWidth(2.0)
-# actor.GetProperty().SetColor(colors.GetColor3d("MistyRose"))
-#
-# backface = vtk.vtkProperty()
-# backface.SetColor(colors.GetColor3d('Tomato'))
-# actor.SetBackfaceProperty(backface)
-#
-# # Create the Renderer
-# renderer = vtk.vtkRenderer()
-# renderer.AddActor(actor)
-# renderer.SetBackground(colors.GetColor3d('Wheat'))
-#
-# # Create the RendererWindow
-# renderer_window = vtk.vtkRenderWindow()
-# renderer_window.SetSize(640, 480)
-# renderer_window.AddRenderer(renderer)
-# renderer_window.SetWindowName('ReadUnstructuredGrid')
-#
-# # Create the RendererWindowInteractor and display the vtk_file
-# interactor = vtk.vtkRenderWindowInteractor()
-# interactor.SetRenderWindow(renderer_window)
-# interactor.Initialize()
-# interactor.Start()
-#
-#
-# if __name__ == '__main__':
-#     main()
