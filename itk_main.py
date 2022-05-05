@@ -1,56 +1,47 @@
-
 import sys
 import itk
 
-# if len(sys.argv) < 3:
-#     print("Usage: " + sys.argv[0] + " <input1> <input2> <input3> ... <output>")
-#     sys.exit(1)
 
-# run:
-# python3 itk_main.py 60 "data/cells3d_coubex" "data/itk_coubex.tiff"
+def main():
+    # run:
+    # python3 itk_main.py 60 "data/cells3d_coubex" "data/itk_coubex.tiff"
 
-InputDimension = 2
-OutputDimension = 3
+    InputDimension = 2
+    OutputDimension = 3
 
-PixelType = itk.UC
+    PixelType = itk.UC
 
-InputImageType = itk.Image[PixelType, InputDimension]
-OutputImageType = itk.Image[PixelType, OutputDimension]
+    InputImageType = itk.Image[PixelType, InputDimension]
+    OutputImageType = itk.Image[PixelType, OutputDimension]
 
-reader = itk.ImageFileReader[InputImageType].New()
+    reader = itk.ImageFileReader[InputImageType].New()
 
-tileFilter = itk.TileImageFilter[InputImageType, OutputImageType].New()
+    tileFilter = itk.TileImageFilter[InputImageType, OutputImageType].New()
 
-layout = [1, 1, 0]
-tileFilter.SetLayout(layout)
+    layout = [1, 1, 0]
+    tileFilter.SetLayout(layout)
 
-num_images = int(sys.argv[1])
-input_images_folder = sys.argv[2]
+    num_images = int(sys.argv[1])
+    input_images_folder = sys.argv[2]
 
-for idx in range(num_images):
-    reader.SetFileName(input_images_folder + "/{}.png".format(idx))
-    reader.Update()
+    for idx in range(num_images):
+        reader.SetFileName(input_images_folder + "/{}.png".format(idx))
+        reader.Update()
 
-    inputImage = reader.GetOutput()
-    inputImage.DisconnectPipeline()
+        inputImage = reader.GetOutput()
+        inputImage.DisconnectPipeline()
 
-    tileFilter.SetInput(idx, inputImage)
+        tileFilter.SetInput(idx, inputImage)
 
-defaultValue = 128
-tileFilter.SetDefaultPixelValue(defaultValue)
-tileFilter.Update()
+    defaultValue = 128
+    tileFilter.SetDefaultPixelValue(defaultValue)
+    tileFilter.Update()
 
-thresholdFilter = itk.BinaryThresholdImageFilter[OutputImageType, OutputImageType].New()
-thresholdFilter.SetInput(reader.GetOutput())
-
-thresholdFilter.SetLowerThreshold(args.lower_threshold)
-thresholdFilter.SetUpperThreshold(args.upper_threshold)
-thresholdFilter.SetOutsideValue(0)
-thresholdFilter.SetInsideValue(1)
+    writer = itk.ImageFileWriter[OutputImageType].New()
+    writer.SetFileName(sys.argv[-1])
+    writer.SetInput(tileFilter.GetOutput())
+    writer.Update()
 
 
-writer = itk.ImageFileWriter[OutputImageType].New()
-writer.SetFileName(sys.argv[-1])
-writer.SetInput(tileFilter.GetOutput())
-writer.Update()
-
+if __name__ == '__main__':
+    main()
