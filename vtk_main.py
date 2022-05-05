@@ -78,6 +78,21 @@ def main():
     # Tell the application to use the function as an exit check.
     renderWin.AddObserver("AbortCheckEvent", exitCheck)
 
+    # Create a custom lut. The lut is used for both at the mapper and at the
+    # scalar_bar
+    lut = vtk.vtkLookupTable()
+    lut.Build()
+    # create the scalar_bar
+    scalar_bar = vtk.vtkScalarBarActor()
+    scalar_bar.SetOrientationToHorizontal()
+    scalar_bar.SetLookupTable(lut)
+
+    # create the scalar_bar_widget
+    scalar_bar_widget = vtk.vtkScalarBarWidget()
+    scalar_bar_widget.SetInteractor(renderInteractor)
+    scalar_bar_widget.SetScalarBarActor(scalar_bar)
+    scalar_bar_widget.On()
+
     renderInteractor.Initialize()
     # Because nothing will be rendered without any input, we order the first render manually
     #  before control is handed over to the main-loop.
