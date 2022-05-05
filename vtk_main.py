@@ -15,6 +15,12 @@ def get_program_parameters():
     return args.filename
 
 
+def boxCallback(obj, event):
+    t = vtk.vtkTransform()
+    obj.GetTransform(t)
+    obj.GetProp3D().SetUserTransform(t)
+
+
 def main():
     # run:
     # python3 vtk_main.py data/itk_coubex.vtk
@@ -92,6 +98,17 @@ def main():
     scalar_bar_widget.SetInteractor(renderInteractor)
     scalar_bar_widget.SetScalarBarActor(scalar_bar)
     scalar_bar_widget.On()
+
+    # A Box widget
+    boxWidget = vtk.vtkBoxWidget()
+    boxWidget.SetInteractor(renderInteractor)
+    boxWidget.SetProp3D(volume)
+    boxWidget.SetPlaceFactor(1.25)  # Make the box 1.25x larger than the actor
+    boxWidget.PlaceWidget()
+    boxWidget.On()
+
+    # Connect the event to a function
+    boxWidget.AddObserver('InteractionEvent', boxCallback)
 
     renderInteractor.Initialize()
     # Because nothing will be rendered without any input, we order the first render manually
